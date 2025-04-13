@@ -61,7 +61,7 @@ export default function DashboardPage() {
   const fetchChartData = useCallback(
     async (
       view: ViewType,
-      field: string,
+      field: HourlyField | DailyField,
       setter: (data: ChartPoint[]) => void
     ) => {
       if (!id) return;
@@ -81,30 +81,42 @@ export default function DashboardPage() {
         console.error(`${field} fetch error:`, err);
       }
     },
-    [id, setCurrentMonth]
+    [id]
   );
 
   useEffect(() => {
-    fetchChartData("hour", "boarding_load", setDistanceData);
-  }, [fetchChartData]);
+    if (!id) return;
 
-  useEffect(() => {
-    if (id)
-      fetchChartData(distanceViewType, "driving_distance", setDistanceData);
-  }, [distanceViewType]);
+    const viewConfigs: {
+      view: ViewType;
+      field: HourlyField | DailyField;
+      setter: (data: ChartPoint[]) => void;
+    }[] = [
+      {
+        view: distanceViewType,
+        field: "driving_distance",
+        setter: setDistanceData,
+      },
+      {
+        view: passengerViewType,
+        field: "boarding_passanger",
+        setter: setPassengerData,
+      },
+      { view: loadViewType, field: "boarding_load", setter: setLoadData },
+      { view: startNumViewType, field: "start_num", setter: setStartNumData },
+    ];
 
-  useEffect(() => {
-    if (id)
-      fetchChartData(passengerViewType, "boarding_passanger", setPassengerData);
-  }, [passengerViewType]);
-
-  useEffect(() => {
-    if (id) fetchChartData(loadViewType, "boarding_load", setLoadData);
-  }, [loadViewType]);
-
-  useEffect(() => {
-    if (id) fetchChartData(startNumViewType, "start_num", setStartNumData);
-  }, [startNumViewType]);
+    viewConfigs.forEach(({ view, field, setter }) => {
+      fetchChartData(view, field, setter);
+    });
+  }, [
+    id,
+    distanceViewType,
+    passengerViewType,
+    loadViewType,
+    startNumViewType,
+    fetchChartData,
+  ]);
 
   // 쿠키 체크 전이면 아무것도 없이 return
   if (!mounted || id === null || role === null) {
@@ -153,16 +165,32 @@ export default function DashboardPage() {
 
 type HourlyRaw = {
   hour: number;
-  [key: string]: any;
+  boarding_load: number;
+  boarding_passanger: number;
+  driving_distance: number;
+  start_num: number;
 };
+type HourlyField =
+  | "boarding_load"
+  | "boarding_passanger"
+  | "driving_distance"
+  | "start_num";
 
 type DailyRaw = {
   date: string;
-  [key: string]: any;
+  boarding_load: number;
+  boarding_passanger: number;
+  driving_distance: number;
+  start_num: number;
 };
+type DailyField =
+  | "boarding_load"
+  | "boarding_passanger"
+  | "driving_distance"
+  | "start_num";
 
 // group 함수들
-function groupHourly(data: HourlyRaw[], field: string): ChartPoint[] {
+function groupHourly(data: HourlyRaw[], field: HourlyField): ChartPoint[] {
   return Array.from({ length: 24 }, (_, hour) => {
     const sum = data
       .filter((d) => d.hour === hour)
@@ -174,7 +202,7 @@ function groupHourly(data: HourlyRaw[], field: string): ChartPoint[] {
   });
 }
 
-function groupDaily(data: DailyRaw[], field: string): ChartPoint[] {
+function groupDaily(data: DailyRaw[], field: DailyField): ChartPoint[] {
   const dayMap: Record<number, number> = {};
   data.forEach((d) => {
     const day = new Date(d.date).getDate();
