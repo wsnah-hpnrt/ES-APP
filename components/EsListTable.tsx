@@ -165,7 +165,7 @@ export default function EsListTable({
           </tr>
         </thead>
         <tbody>
-          {visibleRows.map((es, _idx) => (
+          {visibleRows.map((es) => (
             <tr
               key={es.es_id}
               className={`text-center hover:bg-gray-50 ${

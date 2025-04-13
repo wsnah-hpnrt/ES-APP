@@ -35,7 +35,7 @@ export default function ActivityTracker() {
       events.forEach((event) => window.removeEventListener(event, resetTimer));
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, []);
+  }, [resetTimer]);
 
   return null;
 }

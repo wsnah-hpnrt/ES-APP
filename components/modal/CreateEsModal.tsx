@@ -31,7 +31,7 @@ export default function CreateEsModal({ onClose, onSuccess }: Props) {
     detail_address: "",
   });
 
-  const [_loading, setLoading] = useState(false);
+  // const [_loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   //확인모달, 성공모달
@@ -102,7 +102,7 @@ export default function CreateEsModal({ onClose, onSuccess }: Props) {
     form.detail_address;
 
   const handleSubmit = async () => {
-    setLoading(true);
+    //    setLoading(true);
     setError("");
 
     // 1. escalators table insert
@@ -119,7 +119,7 @@ export default function CreateEsModal({ onClose, onSuccess }: Props) {
       .single();
     if (escalatorError) {
       setError("에스컬레이터 정보 저장 실패: " + escalatorError.message);
-      setLoading(false);
+      //      setLoading(false);
       return;
     }
 
@@ -133,11 +133,11 @@ export default function CreateEsModal({ onClose, onSuccess }: Props) {
 
     if (userError) {
       setError("생성 실패: " + userError.message);
-      setLoading(false);
+      //      setLoading(false);
       return;
     }
 
-    setLoading(false);
+    //    setLoading(false);
     setShowConfirmModal(false); // 확인 모달 표시
     setShowSuccessModal(true); // 성공 모달 표시
   };
@@ -202,6 +202,7 @@ export default function CreateEsModal({ onClose, onSuccess }: Props) {
             )}
           </div>
           <div></div>
+
           {/* <div>
             <label className="text-sm text-gray-600">원격 관리 여부</label>
             <select
