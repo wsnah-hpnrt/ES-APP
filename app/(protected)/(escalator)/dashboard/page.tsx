@@ -2,7 +2,7 @@
 
 import ChartCard from "@/components/charts/ChartCard";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getHourlyData } from "@/lib/fetchers/getHourlyData";
 import { getDailyData } from "@/lib/fetchers/getDailyData";
 import Cookies from "js-cookie";
@@ -10,6 +10,10 @@ import { ROUTES } from "@/lib/routes";
 import AccessDeny from "@/components/AccessDeny";
 
 type ViewType = "hour" | "day";
+type ChartPoint = {
+  label: string;
+  value: number;
+};
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -26,10 +30,10 @@ export default function DashboardPage() {
   const [startNumViewType] = useState<ViewType>("day");
 
   // 각 차트별 데이터 patch
-  const [distanceData, setDistanceData] = useState<any[]>([]);
-  const [passengerData, setPassengerData] = useState<any[]>([]);
-  const [loadData, setLoadData] = useState<any[]>([]);
-  const [startNumData, setStartNumData] = useState<any[]>([]);
+  const [distanceData, setDistanceData] = useState<ChartPoint[]>([]);
+  const [passengerData, setPassengerData] = useState<ChartPoint[]>([]);
+  const [loadData, setLoadData] = useState<ChartPoint[]>([]);
+  const [startNumData, setStartNumData] = useState<ChartPoint[]>([]);
   const [currentMonth, setCurrentMonth] = useState<number | null>(null);
 
   useEffect(() => {
@@ -54,28 +58,35 @@ export default function DashboardPage() {
   }, [mounted, id, router]);
 
   // 차트 데이터 fetch
-  const fetchChartData = async (
-    view: ViewType,
-    field: string,
-    setter: (data: any[]) => void
-  ) => {
-    if (!id) return;
+  const fetchChartData = useCallback(
+    async (
+      view: ViewType,
+      field: string,
+      setter: (data: ChartPoint[]) => void
+    ) => {
+      if (!id) return;
 
-    try {
-      if (view === "hour") {
-        const data = await getHourlyData(id);
-        const grouped = groupHourly(data, field);
-        setter(grouped);
-      } else {
-        const { data, month } = await getDailyData(id);
-        const grouped = groupDaily(data, field);
-        setter(grouped);
-        setCurrentMonth(month);
+      try {
+        if (view === "hour") {
+          const data = await getHourlyData(id);
+          const grouped = groupHourly(data, field);
+          setter(grouped);
+        } else {
+          const { data, month } = await getDailyData(id);
+          const grouped = groupDaily(data, field);
+          setter(grouped);
+          setCurrentMonth(month);
+        }
+      } catch (err) {
+        console.error(`${field} fetch error:`, err);
       }
-    } catch (err) {
-      console.error(`${field} fetch error:`, err);
-    }
-  };
+    },
+    [id, setCurrentMonth]
+  );
+
+  useEffect(() => {
+    fetchChartData("hour", "boarding_load", setDistanceData);
+  }, [fetchChartData]);
 
   useEffect(() => {
     if (id)
@@ -140,8 +151,18 @@ export default function DashboardPage() {
   );
 }
 
+type HourlyRaw = {
+  hour: number;
+  [key: string]: any;
+};
+
+type DailyRaw = {
+  date: string;
+  [key: string]: any;
+};
+
 // group 함수들
-function groupHourly(data: any[], field: string) {
+function groupHourly(data: HourlyRaw[], field: string): ChartPoint[] {
   return Array.from({ length: 24 }, (_, hour) => {
     const sum = data
       .filter((d) => d.hour === hour)
@@ -153,7 +174,7 @@ function groupHourly(data: any[], field: string) {
   });
 }
 
-function groupDaily(data: any[], field: string) {
+function groupDaily(data: DailyRaw[], field: string): ChartPoint[] {
   const dayMap: Record<number, number> = {};
   data.forEach((d) => {
     const day = new Date(d.date).getDate();

@@ -43,7 +43,7 @@ export default function DetailEsModal({
     detail_address: escalator.detail_address,
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [_error, setError] = useState("");
 
   //확인모달, 성공모달
   const [showConfirmModal, setShowConfirmModal] = useState(false);

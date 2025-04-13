@@ -6,7 +6,7 @@ import { ROUTES } from "@/lib/routes";
 import { supabase } from "@/lib/supabase";
 import Cookies from "js-cookie";
 import InputWithPlaceholder from "@/components/InputWithPlaceholder";
-
+import Image from "next/image";
 export default function LoginForm() {
   const router = useRouter();
   const [id, setId] = useState("");
@@ -70,7 +70,7 @@ export default function LoginForm() {
       className="w-full max-w-sm space-y-4 p-6 shadow-lg bg-white rounded-2xl"
     >
       <div className="flex flex-col items-center gap-2">
-        <img src="/HPNRT.png" alt="Logo" className="w-60" />
+        <Image src="/HPNRT.png" alt="Logo" className="w-60" />
         <p>ES-APP</p>
       </div>
 
