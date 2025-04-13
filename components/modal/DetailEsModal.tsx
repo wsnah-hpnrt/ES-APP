@@ -43,7 +43,7 @@ export default function DetailEsModal({
     detail_address: escalator.detail_address,
   });
   const [loading, setLoading] = useState(false);
-  const [_error, setError] = useState("");
+  const [error, setError] = useState("");
 
   //확인모달, 성공모달
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -217,6 +217,8 @@ export default function DetailEsModal({
         <h2 className="text-xl font-semibold mb-4">에스컬레이터 상세 정보</h2>
 
         <div className="grid grid-cols-2 gap-4">
+          {error && <p className="text-sm text-red-500 mt-4">{error}</p>}
+
           <div>
             <label className="text-sm text-gray-600">현장명</label>
             <InputWithPlaceholder
