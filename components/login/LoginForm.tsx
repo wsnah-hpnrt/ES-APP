@@ -70,7 +70,13 @@ export default function LoginForm() {
       className="w-full max-w-sm space-y-4 p-6 shadow-lg bg-white rounded-2xl"
     >
       <div className="flex flex-col items-center gap-2">
-        <Image src="/HPNRT.png" alt="Logo" className="w-60" />
+        <Image
+          src="/HPNRT.png"
+          alt="Logo"
+          width={240}
+          height={80}
+          className="w-60"
+        />
         <p>ES-APP</p>
       </div>
 
