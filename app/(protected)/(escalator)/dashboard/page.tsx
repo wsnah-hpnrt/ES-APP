@@ -89,11 +89,7 @@ export default function DashboardPage() {
           const grouped = groupHourly(data, field as HourlyField);
           setter(grouped);
         } else if (view === "day") {
-          const { data, month: returnedMonth } = await getDailyData(
-            id,
-            year,
-            month
-          );
+          const { data } = await getDailyData(id, year, month);
           const grouped = groupDaily(data, field as DailyField);
           setter(grouped);
         } else if (view === "month") {
