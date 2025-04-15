@@ -20,7 +20,7 @@ export default function LogoutButton() {
   return (
     <div className="relative inline-block">
       <button onClick={handleLogout} className="">
-        Logout
+        로그아웃
       </button>
     </div>
   );

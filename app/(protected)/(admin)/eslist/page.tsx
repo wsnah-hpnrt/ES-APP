@@ -2,9 +2,10 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { ROUTES } from "@/lib/routes";
 import { supabase } from "@/lib/supabase";
-import LogoutButton from "@/components/login/LogoutButton";
+import LogoutDropdown from "@/components/login/LogoutDropdown";
 import AccessDeny from "@/components/AccessDeny";
 import EsListTable from "@/components/EsListTable";
+import Image from "next/image";
 
 export const metadata = {
   title: "Escalator List",
@@ -33,12 +34,15 @@ export default async function EsListPage() {
 
   return (
     <main className="flex min-h-screen bg-gray-100">
-      <div className="container px-4">
-        <h1 className="text-xl font-bold mb-4">
-          에스컬레이터 - 빌딩 정보 등록
-        </h1>
-        <div className="">
-          <LogoutButton />
+      <div className="container px-10">
+        <div className="flex items-center py-2">
+          <div>
+            <Image src="/HPNRT.png" alt="LOGO" width={150} height={150} />
+          </div>
+
+          <div className="flex items-center gap-4 ml-auto">
+            <LogoutDropdown id={id} />
+          </div>
         </div>
         <div className="">
           <EsListTable escalators={escalator} />

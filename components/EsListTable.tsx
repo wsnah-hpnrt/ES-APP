@@ -90,13 +90,11 @@ export default function EsListTable({
   const [selectedEscalator, setSelectedEscalator] = useState<Escalator | null>(
     null
   );
-
+  // <p className="text-sm text-gray-600">Showing {escalators.length} items </p>
   return (
-    <div className="w-full bg-white p-6 rounded shadow">
+    <div className="w-full bg-white p-5 rounded shadow">
       <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-gray-600">
-          Showing {escalators.length} items
-        </p>
+        <p className="text-2xl font-bold">에스컬레이터 정보</p>
 
         <div className="flex gap-4 items-center">
           <div className="flex gap-3">
