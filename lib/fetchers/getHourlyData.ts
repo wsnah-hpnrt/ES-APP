@@ -18,7 +18,7 @@ export async function getHourlyData(id: string, date: string) {
       "date, hour, boarding_load, boarding_passenger, driving_distance, start_num"
     )
     .eq("es_id", userData?.es_id)
-    .eq("date", targetDate) //
+    .eq("date", date) //
     .order("hour", { ascending: true }); //
 
   if (error) {

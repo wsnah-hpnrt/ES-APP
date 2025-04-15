@@ -1,11 +1,9 @@
-// lib/utils/chartGroups.ts
-
 export type ChartPoint = {
   label: string;
   value: number;
 };
 
-// ---------- Hourly ----------
+// Hourly
 export type HourlyRaw = {
   hour: number;
   boarding_load: number;
@@ -31,7 +29,7 @@ export function groupHourly(
   });
 }
 
-// ---------- Daily ----------
+// Daily
 export type DailyRaw = {
   date: string;
   boarding_load: number;
@@ -55,7 +53,7 @@ export function groupDaily(data: DailyRaw[], field: DailyField): ChartPoint[] {
   }));
 }
 
-// ---------- Monthly ----------
+// Monthly
 export type MonthlyRaw = {
   date: string;
   boarding_load: number;

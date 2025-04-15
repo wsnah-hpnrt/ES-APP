@@ -42,16 +42,12 @@ export default function DashboardPage() {
   const [year, setYear] = useState<number>(defaultYear);
   const [month, setMonth] = useState<number>(defaultMonth);
   const [day, setDay] = useState<number | null>(null);
-  const [viewType, setViewType] = useState<ViewType>("day");
-
-  const [targetDate, setTargetDate] = useState<string>("");
+  const [viewType, setViewType] = useState<ViewType>("month");
 
   const [distanceData, setDistanceData] = useState<ChartPoint[]>([]);
   const [passengerData, setPassengerData] = useState<ChartPoint[]>([]);
   const [loadData, setLoadData] = useState<ChartPoint[]>([]);
   const [startNumData, setStartNumData] = useState<ChartPoint[]>([]);
-
-  const [currentMonth, setCurrentMonth] = useState<number | null>(null);
 
   useEffect(() => setMounted(true), []);
 
@@ -71,9 +67,9 @@ export default function DashboardPage() {
   }, [mounted, id, router]);
 
   useEffect(() => {
-    const date = new Date(defaultYear, defaultMonth - 1, 1);
-    setTargetDate(date.toISOString().split("T")[0]);
-    setViewType("day");
+    setViewType("month");
+    setMonth(0);
+    setDay(null);
   }, []);
 
   const fetchChartData = useCallback(
@@ -100,7 +96,6 @@ export default function DashboardPage() {
           );
           const grouped = groupDaily(data, field as DailyField);
           setter(grouped);
-          setCurrentMonth(returnedMonth);
         } else if (view === "month") {
           const data = await getMonthlyData(id, year);
           const grouped = groupMonthly(data, field as MonthlyField);
@@ -131,28 +126,102 @@ export default function DashboardPage() {
   if (!mounted || id === null || role === null) return null;
   if (role !== "escalatorusers") return <AccessDeny />;
 
+  // (0월) 표시하기
+  function getTitle(
+    baseTitle: string,
+    month: number | null,
+    day: number | null
+  ) {
+    if (month && day) return `${baseTitle} (${month}월 ${day}일)`;
+    if (month) return `${baseTitle} (${month}월)`;
+    return baseTitle;
+  }
+
   return (
-    <div className="grid grid-cols-2 gap-4">
-      <ChartCard
-        title={currentMonth ? `운행거리 (${currentMonth}월)` : "운행거리"}
-        chartType="area"
-        data={distanceData}
-      />
-      <ChartCard
-        title={currentMonth ? `탑승인원 (${currentMonth}월)` : "탑승인원"}
-        chartType="bar"
-        data={passengerData}
-      />
-      <ChartCard
-        title={currentMonth ? `탑승부하 (${currentMonth}월)` : "탑승부하"}
-        chartType="area"
-        data={loadData}
-      />
-      <ChartCard
-        title={currentMonth ? `기동횟수 (${currentMonth}월)` : "기동횟수"}
-        chartType="bar"
-        data={startNumData}
-      />
+    <div className="w-full space-y-4">
+      <div className="flex justify-end gap-4 items-center">
+        <select
+          value={year}
+          onChange={(e) => {
+            const newYear = Number(e.target.value);
+            setYear(newYear);
+            setMonth(0);
+            setDay(null);
+            setViewType("month");
+          }}
+          className="border px-2 py-1 rounded text-sm"
+        >
+          {Array.from({ length: 5 }, (_, i) => {
+            const y = new Date().getFullYear() - i;
+            return (
+              <option key={y} value={y}>
+                {y}년
+              </option>
+            );
+          })}
+        </select>
+
+        <select
+          value={month || ""}
+          disabled={!year}
+          onChange={(e) => {
+            const newMonth = Number(e.target.value);
+            setMonth(newMonth);
+            setDay(null);
+            setViewType("day");
+          }}
+          className="border px-2 py-1 rounded text-sm"
+        >
+          <option value="">월 선택</option>
+          {Array.from({ length: 12 }, (_, i) => (
+            <option key={i + 1} value={i + 1}>
+              {i + 1}월
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={day || ""}
+          disabled={!month}
+          onChange={(e) => {
+            const newDay = Number(e.target.value);
+            setDay(newDay);
+
+            setViewType("hour");
+          }}
+          className="border px-2 py-1 rounded text-sm"
+        >
+          <option value="">일 선택</option>
+          {Array.from({ length: 31 }, (_, i) => (
+            <option key={i + 1} value={i + 1}>
+              {i + 1}일
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <ChartCard
+          title={getTitle("운행거리", month, day)}
+          chartType="area"
+          data={distanceData}
+        />
+        <ChartCard
+          title={getTitle("탑승인원", month, day)}
+          chartType="bar"
+          data={passengerData}
+        />
+        <ChartCard
+          title={getTitle("탑승부하", month, day)}
+          chartType="area"
+          data={loadData}
+        />
+        <ChartCard
+          title={getTitle("기동횟수", month, day)}
+          chartType="bar"
+          data={startNumData}
+        />
+      </div>
     </div>
   );
 }

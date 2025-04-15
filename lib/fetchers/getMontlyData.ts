@@ -20,7 +20,7 @@ export async function getMonthlyData(id: string, year: number) {
     .select(
       "date, boarding_load, boarding_passenger, driving_distance, start_num"
     )
-    .eq("es_id", userData.es_id)
+    .eq("es_id", Number(userData?.es_id))
     .gte("date", from)
     .lte("date", to)
     .order("date");
@@ -28,6 +28,5 @@ export async function getMonthlyData(id: string, year: number) {
   if (error) {
     throw new Error("monthly data fetch 실패: " + error.message);
   }
-
   return data || [];
 }
