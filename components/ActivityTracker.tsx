@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
-const AUTO_LOGOUT_TIME = 5 * 60 * 1000;
+const AUTO_LOGOUT_TIME = 10 * 60 * 1000;
 
 export default function ActivityTracker() {
   const router = useRouter();

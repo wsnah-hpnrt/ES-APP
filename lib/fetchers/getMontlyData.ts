@@ -1,8 +1,8 @@
 import { supabase } from "@/lib/supabase";
 
-export async function getDailyData(id: string, year: number, month: number) {
-  const fromDate = new Date(year, month - 1, 1);
-  const toDate = new Date(year, month, 0); // 마지막 날
+export async function getMonthlyData(id: string, year: number) {
+  const from = `${year}-01-01`;
+  const to = `${year}-12-31`;
 
   const { data: userData, error: userError } = await supabase
     .from("escalatorusers")
@@ -12,21 +12,22 @@ export async function getDailyData(id: string, year: number, month: number) {
 
   if (userError || !userData) {
     console.error("es_id 조회 실패:", userError?.message);
-    return { data: [], month };
+    return [];
   }
+
   const { data, error } = await supabase
-    .from("dailyrawdata")
+    .from("monthlyrawdata")
     .select(
       "date, boarding_load, boarding_passenger, driving_distance, start_num"
     )
     .eq("es_id", userData.es_id)
-    .gte("date", fromDate.toISOString().slice(0, 10))
-    .lte("date", toDate.toISOString().slice(0, 10))
+    .gte("date", from)
+    .lte("date", to)
     .order("date");
 
   if (error) {
-    throw new Error("daily data fetch 실패: " + error.message);
+    throw new Error("monthly data fetch 실패: " + error.message);
   }
 
-  return { data, month };
+  return data || [];
 }

@@ -3,44 +3,58 @@
 import ChartCard from "@/components/charts/ChartCard";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { getHourlyData } from "@/lib/fetchers/getHourlyData";
-import { getDailyData } from "@/lib/fetchers/getDailyData";
 import Cookies from "js-cookie";
 import { ROUTES } from "@/lib/routes";
 import AccessDeny from "@/components/AccessDeny";
+import { getHourlyData } from "@/lib/fetchers/getHourlyData";
+import { getDailyData } from "@/lib/fetchers/getDailyData";
+import { getMonthlyData } from "@/lib/fetchers/getMontlyData";
 
-type ViewType = "hour" | "day";
-type ChartPoint = {
-  label: string;
-  value: number;
-};
+import {
+  ChartPoint,
+  groupHourly,
+  groupDaily,
+  groupMonthly,
+  HourlyField,
+  DailyField,
+  MonthlyField,
+} from "@/lib/utils/chartGroups";
+
+type ViewType = "hour" | "day" | "month";
 
 export default function DashboardPage() {
   const router = useRouter();
 
-  // 쿠키관련
   const [id, setId] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  // 각 차트별 viewType
-  const [distanceViewType, setDistanceViewType] = useState<ViewType>("day");
-  const [passengerViewType, setPassengerViewType] = useState<ViewType>("day");
-  const [loadViewType, setLoadViewType] = useState<ViewType>("day");
-  const [startNumViewType] = useState<ViewType>("day");
+  // 날짜 상태
+  const now = new Date();
+  const getPreviousMonth = (date: Date) => {
+    const year =
+      date.getMonth() === 0 ? date.getFullYear() - 1 : date.getFullYear();
+    const month = date.getMonth() === 0 ? 12 : date.getMonth();
+    return { year, month };
+  };
+  const { year: defaultYear, month: defaultMonth } = getPreviousMonth(now);
 
-  // 각 차트별 데이터 patch
+  const [year, setYear] = useState<number>(defaultYear);
+  const [month, setMonth] = useState<number>(defaultMonth);
+  const [day, setDay] = useState<number | null>(null);
+  const [viewType, setViewType] = useState<ViewType>("day");
+
+  const [targetDate, setTargetDate] = useState<string>("");
+
   const [distanceData, setDistanceData] = useState<ChartPoint[]>([]);
   const [passengerData, setPassengerData] = useState<ChartPoint[]>([]);
   const [loadData, setLoadData] = useState<ChartPoint[]>([]);
   const [startNumData, setStartNumData] = useState<ChartPoint[]>([]);
+
   const [currentMonth, setCurrentMonth] = useState<number | null>(null);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
 
-  // 쿠키에서 id와 role 가져오기
   useEffect(() => {
     if (mounted) {
       const cookieId = Cookies.get("id");
@@ -50,167 +64,95 @@ export default function DashboardPage() {
     }
   }, [mounted]);
 
-  // 로그인 안 되어 있으면 로그인 페이지로
   useEffect(() => {
     if (mounted && id === "") {
       router.push(ROUTES.LOGIN);
     }
   }, [mounted, id, router]);
 
-  // 차트 데이터 fetch
+  useEffect(() => {
+    const date = new Date(defaultYear, defaultMonth - 1, 1);
+    setTargetDate(date.toISOString().split("T")[0]);
+    setViewType("day");
+  }, []);
+
   const fetchChartData = useCallback(
     async (
       view: ViewType,
-      field: HourlyField | DailyField,
+      field: HourlyField | DailyField | MonthlyField,
       setter: (data: ChartPoint[]) => void
     ) => {
       if (!id) return;
 
       try {
         if (view === "hour") {
-          const data = await getHourlyData(id);
-          const grouped = groupHourly(data, field);
+          const date = `${year}-${String(month).padStart(2, "0")}-${String(
+            day
+          ).padStart(2, "0")}`;
+          const data = await getHourlyData(id, date);
+          const grouped = groupHourly(data, field as HourlyField);
           setter(grouped);
-        } else {
-          const { data, month } = await getDailyData(id);
-          const grouped = groupDaily(data, field);
+        } else if (view === "day") {
+          const { data, month: returnedMonth } = await getDailyData(
+            id,
+            year,
+            month
+          );
+          const grouped = groupDaily(data, field as DailyField);
           setter(grouped);
-          setCurrentMonth(month);
+          setCurrentMonth(returnedMonth);
+        } else if (view === "month") {
+          const data = await getMonthlyData(id, year);
+          const grouped = groupMonthly(data, field as MonthlyField);
+          setter(grouped);
         }
       } catch (err) {
         console.error(`${field} fetch error:`, err);
       }
     },
-    [id]
+    [id, year, month, day]
   );
 
   useEffect(() => {
-    if (!id) return;
+    if (!id || !viewType) return;
 
-    const viewConfigs: {
-      view: ViewType;
-      field: HourlyField | DailyField;
-      setter: (data: ChartPoint[]) => void;
-    }[] = [
-      {
-        view: distanceViewType,
-        field: "driving_distance",
-        setter: setDistanceData,
-      },
-      {
-        view: passengerViewType,
-        field: "boarding_passanger",
-        setter: setPassengerData,
-      },
-      { view: loadViewType, field: "boarding_load", setter: setLoadData },
-      { view: startNumViewType, field: "start_num", setter: setStartNumData },
-    ];
+    const viewConfigs = [
+      { view: viewType, field: "driving_distance", setter: setDistanceData },
+      { view: viewType, field: "boarding_passenger", setter: setPassengerData },
+      { view: viewType, field: "boarding_load", setter: setLoadData },
+      { view: viewType, field: "start_num", setter: setStartNumData },
+    ] as const;
 
     viewConfigs.forEach(({ view, field, setter }) => {
       fetchChartData(view, field, setter);
     });
-  }, [
-    id,
-    distanceViewType,
-    passengerViewType,
-    loadViewType,
-    startNumViewType,
-    fetchChartData,
-  ]);
+  }, [id, viewType, fetchChartData]);
 
-  // 쿠키 체크 전이면 아무것도 없이 return
-  if (!mounted || id === null || role === null) {
-    return null;
-  }
-
-  // 권한에 따른 접근 제한
-  if (role !== "escalatorusers") {
-    return <AccessDeny />;
-  }
+  if (!mounted || id === null || role === null) return null;
+  if (role !== "escalatorusers") return <AccessDeny />;
 
   return (
     <div className="grid grid-cols-2 gap-4">
       <ChartCard
         title={currentMonth ? `운행거리 (${currentMonth}월)` : "운행거리"}
         chartType="area"
-        viewType={distanceViewType}
-        onChangeViewType={setDistanceViewType}
         data={distanceData}
       />
       <ChartCard
         title={currentMonth ? `탑승인원 (${currentMonth}월)` : "탑승인원"}
-        chartType="area"
-        viewType={passengerViewType}
-        onChangeViewType={setPassengerViewType}
+        chartType="bar"
         data={passengerData}
       />
       <ChartCard
         title={currentMonth ? `탑승부하 (${currentMonth}월)` : "탑승부하"}
         chartType="area"
-        viewType={loadViewType}
-        onChangeViewType={setLoadViewType}
         data={loadData}
       />
       <ChartCard
         title={currentMonth ? `기동횟수 (${currentMonth}월)` : "기동횟수"}
         chartType="bar"
-        viewType="day"
-        onChangeViewType={() => {}}
         data={startNumData}
-        hideSelect
       />
     </div>
   );
-}
-
-type HourlyRaw = {
-  hour: number;
-  boarding_load: number;
-  boarding_passanger: number;
-  driving_distance: number;
-  start_num: number;
-};
-type HourlyField =
-  | "boarding_load"
-  | "boarding_passanger"
-  | "driving_distance"
-  | "start_num";
-
-type DailyRaw = {
-  date: string;
-  boarding_load: number;
-  boarding_passanger: number;
-  driving_distance: number;
-  start_num: number;
-};
-type DailyField =
-  | "boarding_load"
-  | "boarding_passanger"
-  | "driving_distance"
-  | "start_num";
-
-// group 함수들
-function groupHourly(data: HourlyRaw[], field: HourlyField): ChartPoint[] {
-  return Array.from({ length: 24 }, (_, hour) => {
-    const sum = data
-      .filter((d) => d.hour === hour)
-      .reduce((acc, cur) => acc + cur[field], 0);
-    return {
-      label: `${hour}`,
-      value: sum,
-    };
-  });
-}
-
-function groupDaily(data: DailyRaw[], field: DailyField): ChartPoint[] {
-  const dayMap: Record<number, number> = {};
-  data.forEach((d) => {
-    const day = new Date(d.date).getDate();
-    dayMap[day] = (dayMap[day] || 0) + d[field];
-  });
-
-  return [...Array(31)].map((_, i) => ({
-    label: `${i + 1}`,
-    value: dayMap[i + 1] || 0,
-  }));
 }
