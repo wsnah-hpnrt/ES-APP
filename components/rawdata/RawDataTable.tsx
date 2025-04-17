@@ -8,13 +8,13 @@ const PRIORITY_KEYS: string[] = [
   "hour",
 ];
 
-interface RawDataTableProps<T> {
+interface RawDataTableProps<T extends object> {
   title: string;
   data: T[];
   onDownload: () => void;
 }
 
-export default function RawDataTable<T extends Record<string, any>>({
+export default function RawDataTable<T extends object>({
   title,
   data,
   onDownload,

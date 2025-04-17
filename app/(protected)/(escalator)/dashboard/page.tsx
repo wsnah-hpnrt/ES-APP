@@ -9,7 +9,6 @@ import AccessDeny from "@/components/AccessDeny";
 import { getHourlyData } from "@/lib/fetchers/getHourlyData";
 import { getDailyData } from "@/lib/fetchers/getDailyData";
 import { getMonthlyData } from "@/lib/fetchers/getMontlyData";
-import LogoutDropDown from "@/components/login/LogoutDropdown";
 
 import {
   ChartPoint,

@@ -58,3 +58,15 @@ export interface HourlyRawData extends EscalatorInfo {
   humidity: number;
   temper: number;
 }
+
+export type JoinedMonthlyRaw = Omit<MonthlyRawData, keyof EscalatorInfo> & {
+  escalator: EscalatorInfo[];
+};
+
+export type JoinedDailyRaw = Omit<DailyRawData, keyof EscalatorInfo> & {
+  escalator: EscalatorInfo[];
+};
+
+export type JoinedHourlyRaw = Omit<HourlyRawData, keyof EscalatorInfo> & {
+  escalator: EscalatorInfo[];
+};

@@ -1,18 +1,24 @@
 import { EscalatorInfo } from "@/lib/types/rawdata";
 
-// Supabase Join 결과 타입 정의
-type WithEscalator<T> = T & { escalator?: EscalatorInfo };
-
-export function flattenJoinedData<T extends object>(
-  data: WithEscalator<T>[]
-): T[] & EscalatorInfo[] {
+export function flattenJoinedData<T>(
+  data: {
+    escalator: EscalatorInfo[] | EscalatorInfo;
+  }[] &
+    T[]
+): (Omit<T, "escalator"> & EscalatorInfo)[] {
   return data.map((item) => {
-    const { escalator, ...rest } = item;
+    const escalatorRaw = Array.isArray(item.escalator)
+      ? item.escalator[0]
+      : item.escalator;
+
+    const rest = { ...item };
+    delete (rest as { escalator?: unknown }).escalator;
+
     return {
-      ...rest,
-      es_num: escalator?.es_num ?? "",
-      es_unit: escalator?.es_unit ?? 0,
-      location: escalator?.location ?? "",
+      ...(rest as unknown as Omit<T, "escalator">),
+      es_num: escalatorRaw?.es_num ?? "",
+      es_unit: escalatorRaw?.es_unit ?? 0,
+      location: escalatorRaw?.location ?? "",
     };
-  }) as T[] & EscalatorInfo[];
+  });
 }

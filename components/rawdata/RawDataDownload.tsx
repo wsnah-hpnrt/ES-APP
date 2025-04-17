@@ -12,6 +12,9 @@ import {
   MonthlyRawData,
   DailyRawData,
   HourlyRawData,
+  JoinedMonthlyRaw,
+  JoinedDailyRaw,
+  JoinedHourlyRaw,
 } from "@/lib/types/rawdata";
 import { flattenJoinedData } from "@/lib/utils/flattenJoinedData";
 import RawDataTable from "./RawDataTable";
@@ -66,7 +69,7 @@ export default function RawDataDownload({ id }: { id: string }) {
       .gte("date", from)
       .lte("date", to);
 
-    setMonthlyData(flattenJoinedData<MonthlyRawData>(monthlyRaw as any));
+    setMonthlyData(flattenJoinedData<JoinedMonthlyRaw>(monthlyRaw ?? []));
 
     const { data: dailyRaw } = await supabase
       .from("dailyrawdata")
@@ -82,7 +85,7 @@ export default function RawDataDownload({ id }: { id: string }) {
       .gte("date", from)
       .lte("date", to);
 
-    setDailyData(flattenJoinedData<DailyRawData>(dailyRaw as any));
+    setDailyData(flattenJoinedData<JoinedDailyRaw>(dailyRaw ?? []));
 
     const { data: hourlyRaw } = await supabase
       .from("hourlyrawdata")
@@ -98,7 +101,7 @@ export default function RawDataDownload({ id }: { id: string }) {
       .gte("date", from)
       .lte("date", to);
 
-    setHourlyData(flattenJoinedData<HourlyRawData>(hourlyRaw as any));
+    setHourlyData(flattenJoinedData<JoinedHourlyRaw>(hourlyRaw ?? []));
   };
 
   return (
