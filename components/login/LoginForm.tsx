@@ -14,7 +14,7 @@ export default function LoginForm() {
   const [error, setError] = useState("");
 
   // 관리자인지, 일반유저인지 분기 선택
-  const [loginType, setLoginType] = useState("escalator");
+  const [loginType, setLoginType] = useState("Escalator");
 
   // 로그인 시 타임스탬프
   const now = new Date();
@@ -32,7 +32,9 @@ export default function LoginForm() {
     e.preventDefault();
 
     const table =
-      loginType === "superadmin" ? "superadminusers" : "escalatorusers";
+      loginType === "SuperAdmin" ? "superadminusers" : "escalatorusers";
+
+    const role = table === "superadminusers" ? "SuperAdmin" : "Escalator";
 
     const { data, error } = await supabase
       .from(table)
@@ -50,13 +52,13 @@ export default function LoginForm() {
     }
 
     Cookies.set("id", data.id, { path: "/" });
-    Cookies.set("role", table, { path: "/" });
+    Cookies.set("role", role, { path: "/" });
 
     // role에 따른 분기점
-    if (table === "superadminusers") {
+    if (role === "SuperAdmin") {
       alert(`반갑습니다. ${data.id}님!\n로그인 일시 : ${loginTime}`);
       router.push(ROUTES.ADMIN_ESLIST);
-    } else if (table === "escalatorusers") {
+    } else if (role === "Escalator") {
       alert(`반갑습니다. ${data.id}님!\n로그인 일시 : ${loginTime}`);
       router.push(ROUTES.ESCALATOR_DASHBOARD);
     } else {
@@ -86,9 +88,9 @@ export default function LoginForm() {
             <input
               type="radio"
               name="loginType"
-              value="escalator"
-              checked={loginType === "escalator"}
-              onChange={() => setLoginType("escalator")}
+              value="Escalator"
+              checked={loginType === "Escalator"}
+              onChange={() => setLoginType("Escalator")}
             />
             Escalator
           </label>
@@ -96,9 +98,9 @@ export default function LoginForm() {
             <input
               type="radio"
               name="loginType"
-              value="superadmin"
-              checked={loginType === "superadmin"}
-              onChange={() => setLoginType("superadmin")}
+              value="SuperAdmin"
+              checked={loginType === "SuperAdmin"}
+              onChange={() => setLoginType("SuperAdmin")}
             />
             Admin
           </label>

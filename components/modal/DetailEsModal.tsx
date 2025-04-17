@@ -372,7 +372,11 @@ export default function DetailEsModal({
 
         <div className="flex justify-between items-center mt-6">
           <button
-            onClick={onClose}
+            onClick={
+              (onClose = () => {
+                onUpdated?.();
+              })
+            }
             className="bg-black text-white px-4 py-2 rounded"
           >
             닫기
@@ -454,7 +458,7 @@ export default function DetailEsModal({
                 message="완료되었습니다."
                 onClose={() => {
                   setShowSuccessModal(false);
-                  onUpdated?.(); // 리패치
+                  //onUpdated?.(); // 리패치
                   // onClose(); // 모달 전체 닫기
                 }}
               />

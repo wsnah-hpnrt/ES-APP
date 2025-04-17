@@ -299,10 +299,14 @@ export default function CreateEsModal({ onClose, onSuccess }: Props) {
         {error && <p className="text-red-600 mt-2 text-sm">{error}</p>}
         <div className="flex justify-between items-center mt-6">
           <button
-            onClick={onClose}
+            onClick={
+              (onClose = () => {
+                onSuccess?.();
+              })
+            }
             className="bg-black text-white px-4 py-2 rounded"
           >
-            Close
+            닫기
           </button>
 
           <button
@@ -330,7 +334,7 @@ export default function CreateEsModal({ onClose, onSuccess }: Props) {
               message="생성이 완료되었습니다."
               onClose={() => {
                 setShowSuccessModal(false);
-                onSuccess?.(); // 리패치
+                //onSuccess?.(); // 리패치
                 // onClose(); // 모달 전체 닫기
               }}
             />

@@ -20,7 +20,7 @@ export default async function EsListPage() {
     redirect(ROUTES.LOGIN);
   }
 
-  if (role !== "superadminusers") {
+  if (role !== "SuperAdmin") {
     return <AccessDeny />;
   }
 
@@ -41,7 +41,7 @@ export default async function EsListPage() {
           </div>
 
           <div className="flex items-center gap-4 ml-auto">
-            <LogoutDropdown id={id} />
+            <LogoutDropdown id={id} role={role} />
           </div>
         </div>
         <div className="">

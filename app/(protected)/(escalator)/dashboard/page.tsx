@@ -9,6 +9,7 @@ import AccessDeny from "@/components/AccessDeny";
 import { getHourlyData } from "@/lib/fetchers/getHourlyData";
 import { getDailyData } from "@/lib/fetchers/getDailyData";
 import { getMonthlyData } from "@/lib/fetchers/getMontlyData";
+import LogoutDropDown from "@/components/login/LogoutDropdown";
 
 import {
   ChartPoint,
@@ -18,7 +19,7 @@ import {
   HourlyField,
   DailyField,
   MonthlyField,
-} from "@/lib/utils/chartGroups";
+} from "@/lib/utils/chartGroupsUtils";
 
 type ViewType = "hour" | "day" | "month";
 
@@ -120,7 +121,7 @@ export default function DashboardPage() {
   }, [id, viewType, fetchChartData]);
 
   if (!mounted || id === null || role === null) return null;
-  if (role !== "escalatorusers") return <AccessDeny />;
+  if (role !== "Escalator") return <AccessDeny />;
 
   // (0월) 표시하기
   function getTitle(
@@ -134,90 +135,94 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="w-full space-y-4">
-      <div className="flex justify-end gap-4 items-center">
-        <select
-          value={year}
-          onChange={(e) => {
-            const newYear = Number(e.target.value);
-            setYear(newYear);
-            setMonth(0);
-            setDay(null);
-            setViewType("month");
-          }}
-          className="border px-2 py-1 rounded text-sm"
-        >
-          {Array.from({ length: 5 }, (_, i) => {
-            const y = new Date().getFullYear() - i;
-            return (
-              <option key={y} value={y}>
-                {y}년
-              </option>
-            );
-          })}
-        </select>
+    <main className="flex min-h-screen">
+      <div className="container px-3">
+        <div className="">
+          <div className="flex justify-end gap-4 items-center py-2">
+            <select
+              value={year}
+              onChange={(e) => {
+                const newYear = Number(e.target.value);
+                setYear(newYear);
+                setMonth(0);
+                setDay(null);
+                setViewType("month");
+              }}
+              className="border px-2 py-1 rounded text-sm"
+            >
+              {Array.from({ length: 5 }, (_, i) => {
+                const y = new Date().getFullYear() - i;
+                return (
+                  <option key={y} value={y}>
+                    {y}년
+                  </option>
+                );
+              })}
+            </select>
 
-        <select
-          value={month || ""}
-          disabled={!year}
-          onChange={(e) => {
-            const newMonth = Number(e.target.value);
-            setMonth(newMonth);
-            setDay(null);
-            setViewType("day");
-          }}
-          className="border px-2 py-1 rounded text-sm"
-        >
-          <option value="">월 선택</option>
-          {Array.from({ length: 12 }, (_, i) => (
-            <option key={i + 1} value={i + 1}>
-              {i + 1}월
-            </option>
-          ))}
-        </select>
+            <select
+              value={month || ""}
+              disabled={!year}
+              onChange={(e) => {
+                const newMonth = Number(e.target.value);
+                setMonth(newMonth);
+                setDay(null);
+                setViewType("day");
+              }}
+              className="border px-2 py-1 rounded text-sm"
+            >
+              <option value="">월 선택</option>
+              {Array.from({ length: 12 }, (_, i) => (
+                <option key={i + 1} value={i + 1}>
+                  {i + 1}월
+                </option>
+              ))}
+            </select>
 
-        <select
-          value={day || ""}
-          disabled={!month}
-          onChange={(e) => {
-            const newDay = Number(e.target.value);
-            setDay(newDay);
+            <select
+              value={day || ""}
+              disabled={!month}
+              onChange={(e) => {
+                const newDay = Number(e.target.value);
+                setDay(newDay);
 
-            setViewType("hour");
-          }}
-          className="border px-2 py-1 rounded text-sm"
-        >
-          <option value="">일 선택</option>
-          {Array.from({ length: 31 }, (_, i) => (
-            <option key={i + 1} value={i + 1}>
-              {i + 1}일
-            </option>
-          ))}
-        </select>
+                setViewType("hour");
+              }}
+              className="border px-2 py-1 rounded text-sm"
+            >
+              <option value="">일 선택</option>
+              {Array.from({ length: 31 }, (_, i) => (
+                <option key={i + 1} value={i + 1}>
+                  {i + 1}일
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <ChartCard
+              title={getTitle("운행거리", month, day)}
+              chartType="area"
+              data={distanceData}
+            />
+            <ChartCard
+              title={getTitle("탑승인원", month, day)}
+              chartType="bar"
+              data={passengerData}
+            />
+            <ChartCard
+              title={getTitle("탑승부하", month, day)}
+              chartType="area"
+              data={loadData}
+            />
+            <ChartCard
+              title={getTitle("기동횟수", month, day)}
+              chartType="bar"
+              data={startNumData}
+            />
+          </div>
+        </div>
       </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <ChartCard
-          title={getTitle("운행거리", month, day)}
-          chartType="area"
-          data={distanceData}
-        />
-        <ChartCard
-          title={getTitle("탑승인원", month, day)}
-          chartType="bar"
-          data={passengerData}
-        />
-        <ChartCard
-          title={getTitle("탑승부하", month, day)}
-          chartType="area"
-          data={loadData}
-        />
-        <ChartCard
-          title={getTitle("기동횟수", month, day)}
-          chartType="bar"
-          data={startNumData}
-        />
-      </div>
-    </div>
+    </main>
   );
 }

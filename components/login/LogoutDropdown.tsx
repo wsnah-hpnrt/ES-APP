@@ -4,7 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { FiUser } from "react-icons/fi";
 import LogoutButton from "./LogoutButton";
 
-export default function UserDropdown({ id }: { id: string }) {
+export default function UserDropdown({
+  id,
+  role,
+}: {
+  id: string;
+  role: string;
+}) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -33,7 +39,7 @@ export default function UserDropdown({ id }: { id: string }) {
       >
         <div className="flex flex-col text-sm text-right">
           <span className="font-medium">{id} 님</span>
-          <span className="text-xs text-gray-500">superadmin</span>
+          <span className="text-xs text-gray-500">{role}</span>
         </div>
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-700 to-yellow-300 text-white flex items-center justify-center">
           <FiUser size={25} />

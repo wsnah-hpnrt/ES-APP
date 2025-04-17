@@ -33,14 +33,14 @@ export default function MetricChart({
           <XAxis dataKey="label" />
           <YAxis />
           <Tooltip />
-          <Bar dataKey="value" fill="#FB923C" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="value" fill="#60A5FA" radius={[6, 6, 0, 0]} />
         </BarChart>
       ) : (
         <AreaChart data={data}>
           <defs>
             <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#f97316" stopOpacity={0.4} />
-              <stop offset="100%" stopColor="#f97316" stopOpacity={0} />
+              <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.4} />
+              <stop offset="100%" stopColor="#3B82F6" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid stroke="#eee" strokeDasharray="3 3" />
@@ -50,7 +50,7 @@ export default function MetricChart({
           <Area
             type="monotone"
             dataKey="value"
-            stroke="#FB923C"
+            stroke="#3B82F6"
             fill="url(#lineGradient)"
             strokeWidth={2}
             dot={{ r: 4 }}

@@ -11,9 +11,9 @@ export default async function LoginPage() {
   //쿠키 검사 후 로그인 상태면 redirect
   const cookieStore = await cookies();
   const role = cookieStore.get("role")?.value;
-  if (role === "superadminusers") {
+  if (role === "SuperAdmin") {
     redirect(ROUTES.ADMIN_ESLIST);
-  } else if (role === "escalatorusers") {
+  } else if (role === "Escalator") {
     redirect(ROUTES.ESCALATOR_DASHBOARD);
   }
 
