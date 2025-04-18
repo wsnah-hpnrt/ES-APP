@@ -15,7 +15,7 @@ export default function ChartCard({
 }: ChartCardProps) {
   return (
     <div className="bg-white p-4 rounded-lg shadow-md border border-gray-100">
-      <h2 className="text-md font-semibold">{title}</h2>
+      <h2 className="text-lg font-semibold text-center py-2">{title}</h2>
       <MetricChart data={data} chartType={chartType} />
     </div>
   );

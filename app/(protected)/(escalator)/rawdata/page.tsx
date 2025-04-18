@@ -32,10 +32,13 @@ export default function RawDataPage() {
   if (role !== "Escalator") {
     return <AccessDeny />;
   }
-  console.log(id);
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="container mx-auto px-4">
+    <main className="min-h-screen justify-center overflow-x-hidden">
+      <div>
+        <p className="text-4xl ">RawData 조회</p>
+      </div>
+      <div className="container mx-auto py-10">
         {id && <RawDataDownload id={id} />}
       </div>
     </main>

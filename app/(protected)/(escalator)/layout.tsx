@@ -8,11 +8,13 @@ export default function EscalatorLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex min-h-screen">
+    <main className="flex h-screen w-screen overflow-x-hidden">
       <Sidebar />
-      <div className="flex-1">
-        <Topbar />
-        <div className="px-10 py-6">{children}</div>
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="w-full border-b border-gray-200  px-6 ">
+          <Topbar />
+        </div>
+        <div className="flex-1 px-10 py-6 overflow-y-auto">{children}</div>
       </div>
     </main>
   );

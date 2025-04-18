@@ -81,12 +81,16 @@ export default function DashboardPage() {
       if (!id) return;
 
       try {
-        if (view === "hour") {
+        if (view === "hour" && day) {
           const date = `${year}-${String(month).padStart(2, "0")}-${String(
             day
           ).padStart(2, "0")}`;
           const data = await getHourlyData(id, date);
           const grouped = groupHourly(data, field as HourlyField);
+          setter(grouped);
+        } else if (view === "hour" && !day) {
+          const { data } = await getDailyData(id, year, month);
+          const grouped = groupDaily(data, field as DailyField);
           setter(grouped);
         } else if (view === "day") {
           const { data } = await getDailyData(id, year, month);
@@ -132,6 +136,9 @@ export default function DashboardPage() {
     if (month) return `${baseTitle} (${month}월)`;
     return baseTitle;
   }
+
+  // 윤년 및 30, 31일 계산하기
+  const lastDayOfMonth = month ? new Date(year, month, 0).getDate() : 31;
 
   return (
     <main className="flex min-h-screen">
@@ -190,7 +197,7 @@ export default function DashboardPage() {
               className="border px-2 py-1 rounded text-sm"
             >
               <option value="">일 선택</option>
-              {Array.from({ length: 31 }, (_, i) => (
+              {Array.from({ length: lastDayOfMonth }, (_, i) => (
                 <option key={i + 1} value={i + 1}>
                   {i + 1}일
                 </option>

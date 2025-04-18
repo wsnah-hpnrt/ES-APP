@@ -35,8 +35,8 @@ export default function RawDataTable<T extends object>({
   ];
 
   return (
-    <section className="space-y-2">
-      <div className="flex justify-between items-center">
+    <section className="space-y-2 w-full py-3">
+      <div className="flex justify-between items-center ">
         <h3 className="text-lg font-semibold">{title}</h3>
         <button
           className="bg-gray-800 text-white px-3 py-1 rounded text-sm"
@@ -46,12 +46,15 @@ export default function RawDataTable<T extends object>({
         </button>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-sm text-left border">
+      <div className="w-full overflow-x-auto">
+        <table className="min-w-[1000px] text-sm text-left border table-auto">
           <thead>
             <tr>
               {orderedKeys.map((key) => (
-                <th key={String(key)} className="border px-2 py-1 bg-gray-100">
+                <th
+                  key={String(key)}
+                  className="border px-2 py-1 bg-gray-100 whitespace-nowrap"
+                >
                   {key as string}
                 </th>
               ))}
@@ -61,7 +64,10 @@ export default function RawDataTable<T extends object>({
             {data.map((row, i) => (
               <tr key={i}>
                 {orderedKeys.map((key) => (
-                  <td key={String(key)} className="border px-2 py-1">
+                  <td
+                    key={String(key)}
+                    className="border px-2 py-1 whitespace-nowrap"
+                  >
                     {String(row[key])}
                   </td>
                 ))}

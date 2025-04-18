@@ -8,14 +8,23 @@ import {
 function convertToCSV<T extends object>(data: T[]): string {
   if (data.length === 0) return "";
 
-  const headers = Object.keys(data[0]);
+  // num, unit, location 순으로 정렬하기
+  const PRIORITY_KEYS = ["es_num", "es_unit", "location"];
+  const allKeys = Object.keys(data[0]);
+  const otherKeys = allKeys.filter((key) => !PRIORITY_KEYS.includes(key));
+  const orderedKeys = [...PRIORITY_KEYS, ...otherKeys];
+
+  const header = orderedKeys.join(",");
   const rows = data.map((row) =>
-    headers
-      .map((field) => (row as Record<string, string | number>)[field])
+    orderedKeys
+      .map((key) => {
+        const val = (row as Record<string, string | number | undefined>)[key];
+        return val !== undefined ? `"${val}"` : '""';
+      })
       .join(",")
   );
 
-  return [headers.join(","), ...rows].join("\n");
+  return [header, ...rows].join("\n");
 }
 
 // CSV 다운로드 Blob 생성
@@ -70,19 +79,19 @@ export function downloadMergedCSV(
   let mergedCSV = "";
 
   if (datasets.monthly?.length) {
-    mergedCSV += "=== 월간 데이터 ===\n";
+    mergedCSV += "monthly\n";
     mergedCSV += convertToCSV(datasets.monthly);
     mergedCSV += "\n\n";
   }
 
   if (datasets.daily?.length) {
-    mergedCSV += "=== 일간 데이터 ===\n";
+    mergedCSV += "daily\n";
     mergedCSV += convertToCSV(datasets.daily);
     mergedCSV += "\n\n";
   }
 
   if (datasets.hourly?.length) {
-    mergedCSV += "=== 시간별 데이터 ===\n";
+    mergedCSV += "hourly\n";
     mergedCSV += convertToCSV(datasets.hourly);
   }
 

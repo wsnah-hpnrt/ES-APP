@@ -105,7 +105,7 @@ export default function RawDataDownload({ id }: { id: string }) {
   };
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="">
       {/* 날짜 조회 영역 */}
       <div className="flex gap-4 items-center">
         <select
@@ -137,7 +137,7 @@ export default function RawDataDownload({ id }: { id: string }) {
 
         <button
           onClick={handleSearch}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
         >
           조회
         </button>
@@ -187,30 +187,31 @@ export default function RawDataDownload({ id }: { id: string }) {
           조회된 데이터 전체 다운로드
         </button>
       </div>
+      <div className="w-full overflow-x-auto py-5">
+        {showMonthly && (
+          <RawDataTable
+            title="📆 월간 데이터"
+            data={monthlyData}
+            onDownload={() => downloadMonthlyCSV(monthlyData, year, month)}
+          />
+        )}
 
-      {showMonthly && (
-        <RawDataTable
-          title="📆 월간 데이터"
-          data={monthlyData}
-          onDownload={() => downloadMonthlyCSV(monthlyData, year, month)}
-        />
-      )}
+        {showDaily && (
+          <RawDataTable
+            title="📅 일간 데이터"
+            data={dailyData}
+            onDownload={() => downloadDailyCSV(dailyData, year, month)}
+          />
+        )}
 
-      {showDaily && (
-        <RawDataTable
-          title="📅 일간 데이터"
-          data={dailyData}
-          onDownload={() => downloadDailyCSV(dailyData, year, month)}
-        />
-      )}
-
-      {showHourly && (
-        <RawDataTable
-          title="⏰ 시간별 데이터"
-          data={hourlyData}
-          onDownload={() => downloadHourlyCSV(hourlyData, year, month)}
-        />
-      )}
+        {showHourly && (
+          <RawDataTable
+            title="⏰ 시간별 데이터"
+            data={hourlyData}
+            onDownload={() => downloadHourlyCSV(hourlyData, year, month)}
+          />
+        )}
+      </div>
     </div>
   );
 }

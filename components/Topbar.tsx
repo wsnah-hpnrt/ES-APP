@@ -16,7 +16,7 @@ export default function Topbar() {
   }, []);
 
   return (
-    <div className="flex items-center py-8 px-6">
+    <div className="flex items-center py-8 px-6 w-full overflow-x-hidden">
       <div className="flex items-center gap-4 ml-auto">
         {id && role && <LogoutDropDown id={id} role={role} />}
       </div>
